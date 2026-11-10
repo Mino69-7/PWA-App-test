@@ -6,13 +6,17 @@ import * as audio from './core/audio.js';
 import * as effects from './core/effects.js';
 import { createHomeGuard } from './core/homeGuard.js';
 import { createSession, createPauseScreen } from './core/session.js';
+import train from './games/train.js';
 import bubbles from './games/bubbles.js';
 import shapes from './games/shapes.js';
 import colors from './games/colors.js';
-import animals from './games/animals.js';
+import coloring from './games/coloring.js';
+import peekaboo from './games/peekaboo.js';
+import food from './games/food.js';
+import music from './games/music.js';
 
 // Pour ajouter un jeu : créer js/games/monjeu.js sur le même modèle et l'ajouter ici.
-const GAMES = [bubbles, shapes, colors, animals];
+const GAMES = [train, bubbles, shapes, colors, coloring, peekaboo, food, music];
 const FADE_MS = 600;
 
 // Durée avant la pause douce. Pour tester : ajouter ?minutes=0.5 à l'adresse.
@@ -69,7 +73,7 @@ function buildMenu() {
     tile.className = 'tile';
     tile.dataset.game = game.id;
     tile.innerHTML = game.icon;
-    tile.style.animationDelay = `${-i * 1.5}s`;
+    tile.style.animationDelay = `${-i * 0.9}s`;
     cell.append(tile);
     menu.append(cell);
     return { game, tile, x: 0, y: 0, reach: 0 };
