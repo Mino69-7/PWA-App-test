@@ -86,13 +86,13 @@ svg {
   padding: 4vmin;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-rows: repeat(4, 1fr);
   gap: 3vmin;
 }
-@media (min-aspect-ratio: 8/5) {
+@media (min-aspect-ratio: 1/1) {
   .menu {
     grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: 1fr;
+    grid-template-rows: repeat(2, 1fr);
   }
 }
 .cell {
@@ -187,34 +187,143 @@ svg {
   65% { transform: rotate(3deg); }
 }
 
-/* ===== Animaux ===== */
-.animals {
+/* ===== Objets des jeux (placés en JavaScript avec transform) ===== */
+.house, .wagon, .loco, .critter, .hide, .dish {
   position: absolute;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  left: 0;
+  top: 0;
+  will-change: transform;
 }
-.animals.wide {
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+.house { z-index: 1; }
+.train {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  will-change: transform;
 }
-.animal {
-  width: 34vmin;
-  height: 34vmin;
-  width: 80cqmin;
-  height: 80cqmin;
-  min-width: 96px;
-  min-height: 96px;
-  animation: float 7s ease-in-out infinite;
+.track {
+  position: absolute;
+  height: 6px;
+  border-radius: 3px;
+  background: #E2D5C3;
+  z-index: 1;
 }
-.animal > svg { transform-origin: 50% 80%; }
-.animal.wiggle > svg { animation: bounce 1s var(--soft); }
-@keyframes bounce {
-  0% { transform: rotate(0) scale(1); }
-  25% { transform: rotate(-7deg) scale(1.06); }
-  55% { transform: rotate(6deg) scale(1.06); }
-  80% { transform: rotate(-2deg) scale(1.02); }
-  100% { transform: rotate(0) scale(1); }
+.loco > svg { transform: scaleX(-1); } /* la locomotive mène le train vers la gauche */
+.critter { z-index: 4; }
+.critter.held, .dish.held { z-index: 6; }
+.critter.inside > svg { animation: none; }
+.critter.gone { opacity: 0; transition: opacity .8s var(--soft), transform 2.2s cubic-bezier(.3,.1,.25,1); }
+.critter.hider { z-index: 2; }
+.hide { z-index: 3; }
+.hide > svg { transition: transform .7s var(--soft); transform-origin: 50% 100%; }
+.hide.open > svg { transform: translateY(18%) scale(.92); }
+.dish { z-index: 4; }
+.dish.eaten { opacity: 0; transition: opacity .6s var(--soft) .3s, transform .45s cubic-bezier(.4,0,.2,1); }
+
+.critter > svg, .house > svg, .wagon > svg, .hide > svg, .basket-front > svg, .basket-back > svg { transform-origin: 50% 80%; }
+
+.hint > svg { animation: hint 1.6s var(--soft); }
+.wave > svg { animation: wave 1.2s var(--soft); }
+.peek > svg { animation: peek .8s var(--soft); }
+.chomp > svg { animation: chomp .9s var(--soft); }
+.nope > svg { animation: nope .8s var(--soft); }
+
+@keyframes hint {
+  0%, 100% { transform: scale(1); }
+  20%, 60% { transform: scale(1.12); }
+  40%, 80% { transform: scale(1); }
+}
+@keyframes wave {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-9deg); }
+  45% { transform: rotate(8deg); }
+  70% { transform: rotate(-5deg); }
+}
+@keyframes peek {
+  from { transform: scale(.3); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+@keyframes chomp {
+  0%, 100% { transform: scale(1); }
+  20%, 60% { transform: scale(1.08, .92); }
+  40%, 80% { transform: scale(.96, 1.05); }
+}
+@keyframes nope {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+  75% { transform: rotate(-3deg); }
+}
+
+/* ===== Coloriage ===== */
+.paper { position: absolute; }
+.paper .part { transition: fill .35s var(--soft); }
+.paper .details { pointer-events: none; }
+.paper.party > svg { animation: hop 1.1s var(--soft); }
+.palette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+.pot {
+  position: absolute;
+  pointer-events: auto;
+  transition: transform .4s var(--soft);
+}
+.pot.selected { transform: scale(1.12) translateY(-4%); }
+.pot.selected::after {
+  content: "";
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  bottom: -10%;
+  height: 8%;
+  border-radius: 4px;
+  background: #CDBEAE;
+}
+
+/* ===== Petit orchestre ===== */
+.bar {
+  position: absolute;
+  border-radius: 22px;
+  transform-origin: 50% 50%;
+}
+.bar .nail {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #FCF8F2;
+  opacity: .6;
+  top: calc(50% - 7px);
+  left: 10%;
+}
+.bar .nail + .nail { left: auto; right: 10%; }
+.bar.upright .nail { left: calc(50% - 7px); top: 8%; }
+.bar.upright .nail + .nail { top: auto; bottom: 8%; right: auto; }
+.bar.ring { animation: ring .6s var(--soft); }
+.bar.glow { animation: glowbar .7s var(--soft); }
+@keyframes ring {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(.95); }
+  60% { transform: scale(1.03); }
+}
+@keyframes glowbar {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  40% { transform: scale(1.06); filter: brightness(1.12); }
+}
+.fly-note {
+  position: absolute;
+  width: 40px;
+  height: 50px;
+  pointer-events: none;
+  animation: flynote 1.4s var(--soft) forwards;
+}
+@keyframes flynote {
+  from { transform: translate(0, 0) scale(.6); opacity: .9; }
+  to { transform: translate(14px, -90px) scale(1); opacity: 0; }
 }
 
 /* ===== Coin caché + bouton maison ===== */
@@ -344,5 +453,5 @@ svg {
 .adult > div > svg { width: 52%; height: 52%; }
 
 @media (prefers-reduced-motion: reduce) {
-  .tile, .animal, .moon, .zz { animation: none; }
+  .tile, .moon, .zz { animation: none; }
 }

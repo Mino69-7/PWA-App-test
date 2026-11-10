@@ -110,11 +110,13 @@ export function moveItem(it, x, y, scale = 1, ms = 0) {
   st.transform = `translate3d(${x - it.size / 2}px, ${y - it.size / 2}px, 0) scale(${scale})`;
 }
 
-// Glisser-déposer tolérant : aimant vers la cible, retour doux sinon,
-// et un simple tap sur l'objet l'envoie tout seul à sa place.
+// Glisser-déposer tolérant : aimant vers la cible, retour doux sinon.
+// Un simple tap sur l'objet l'envoie tout seul à sa place si autoTap() est vrai,
+// sinon il déclenche onHint (aux niveaux plus avancés).
+// onMiss(it, x, y) : l'objet a été lâché loin de sa cible, après un vrai glisser.
 // Chaque objet : el, size, x, y, reach, magnet, home {x,y}, target {x,y},
 // targetScale, done, busy, pointer (null si libre).
-export function createSorter(el, { items, onPick, onPlace, onEmpty }) {
+export function createSorter(el, { items, onPick, onPlace, onEmpty, onMiss, onHint, autoTap = () => true }) {
   const background = {};
 
   function settle(it, ms) {
@@ -160,13 +162,23 @@ export function createSorter(el, { items, onPick, onPlace, onEmpty }) {
       it.pointer = null;
       it.el.classList.remove('held');
       const d = Math.hypot(it.target.x - it.x, it.target.y - it.y);
-      if (!p.cancelled && (p.isTap || d < it.magnet)) {
-        settle(it, p.isTap ? 900 : 450);
+      const dropX = it.x;
+      const dropY = it.y;
+      if (!p.cancelled && p.isTap && autoTap()) {
+        settle(it, 900);
+      } else if (!p.cancelled && !p.isTap && d < it.magnet) {
+        settle(it, 450);
       } else {
         // Mauvais endroit : retour doux, sans aucun son négatif.
         it.busy = true;
-        moveItem(it, it.home.x, it.home.y, 1, 700);
-        setTimeout(() => { it.busy = false; }, 700);
+        moveItem(it, it.home.x, it.home.y, 1, p.isTap ? 250 : 700);
+        setTimeout(() => { it.busy = false; }, p.isTap ? 250 : 700);
+        if (p.cancelled) return;
+        if (p.isTap) {
+          if (onHint) onHint(it);
+        } else if (onMiss && Math.hypot(dropX - it.home.x, dropY - it.home.y) > it.size * 0.6) {
+          onMiss(it, dropX, dropY);
+        }
       }
     },
   });

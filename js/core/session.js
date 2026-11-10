@@ -102,7 +102,7 @@ export function createPauseScreen(parent, { audio, onResume, onHome }) {
       void el.offsetWidth;
       el.classList.add('visible');
       clearTimeout(sayTimer);
-      sayTimer = setTimeout(() => audio.say('pause', 'On fait une petite pause. À bientôt !'), 1800);
+      sayTimer = setTimeout(() => audio.say('pause'), 1800);
     },
     hide() {
       if (!shown) return;

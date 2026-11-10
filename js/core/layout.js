@@ -81,6 +81,40 @@ export function playRect(margin = 12) {
   return r;
 }
 
+// Répartit n objets dans un rectangle en grille, en choisissant le nombre de colonnes
+// qui donne les plus grands objets. fill : part de la case occupée par l'objet.
+export function arrange(rect, n, { fill = 0.78, max = 220 } = {}) {
+  let best = null;
+  for (let cols = 1; cols <= n; cols++) {
+    const rows = Math.ceil(n / cols);
+    const cell = Math.min(rect.w / cols, rect.h / rows);
+    if (!best || cell > best.cell) best = { cols, rows, cell };
+  }
+  const { cols, rows } = best;
+  const cw = rect.w / cols;
+  const ch = rect.h / rows;
+  const size = Math.min(max, best.cell * fill);
+  const points = [];
+  for (let i = 0; i < n; i++) {
+    const row = Math.floor(i / cols);
+    const inRow = row === rows - 1 ? n - row * cols : cols; // dernière rangée centrée
+    const col = i - row * cols;
+    const offset = (cols - inRow) * cw / 2;
+    points.push({ x: rect.x + offset + cw * (col + 0.5), y: rect.y + ch * (row + 0.5) });
+  }
+  return { size, cols, rows, points };
+}
+
+// Découpe un rectangle en deux bandes (haut/bas en portrait, gauche/droite si demandé).
+export function split(rect, ratio, vertical = true) {
+  if (vertical) {
+    const h1 = rect.h * ratio;
+    return [{ x: rect.x, y: rect.y, w: rect.w, h: h1 }, { x: rect.x, y: rect.y + h1, w: rect.w, h: rect.h - h1 }];
+  }
+  const w1 = rect.w * ratio;
+  return [{ x: rect.x, y: rect.y, w: w1, h: rect.h }, { x: rect.x + w1, y: rect.y, w: rect.w - w1, h: rect.h }];
+}
+
 // Canvas net mais pas trop lourd : densité de pixels plafonnée à 2.
 export function fitCanvas(canvas) {
   const dpr = Math.min(2, window.devicePixelRatio || 1);
