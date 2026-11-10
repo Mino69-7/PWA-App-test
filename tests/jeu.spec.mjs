@@ -1,8 +1,9 @@
-﻿// Vérifications automatiques sur WebKit (iPhone et iPad, portrait et paysage).
+// Vérifications automatiques sur WebKit (iPhone et iPad, portrait et paysage).
 import { test, expect } from '@playwright/test';
 
-const GAMES = ['bulles', 'formes', 'couleurs', 'animaux'];
-const TARGETS = '.piece, .hole, .ball, .basket-front, .animal';
+const GAMES = ['train', 'bulles', 'formes', 'couleurs', 'coloriage', 'coucou', 'table', 'orchestre'];
+// Tout ce que l'enfant touche ou vise (les wagons et la locomotive ne sont que décor).
+const TARGETS = '.piece, .hole, .ball, .basket-front, .house, .critter, .pot, .hide, .dish, .bar';
 const MIN_TARGET = 95.5; // 96 px, à l'arrondi du moteur près
 
 let errors;
@@ -17,7 +18,7 @@ test.afterEach(() => {
 
 async function open(page, query = '') {
   await page.goto(`/${query}`);
-  await expect(page.locator('.tile')).toHaveCount(4);
+  await expect(page.locator('.tile')).toHaveCount(GAMES.length);
 }
 
 async function center(locator) {
@@ -129,6 +130,7 @@ test('menu : grosses icônes sans texte, chaque jeu se lance', async ({ page }) 
     await launch(page, id);
     // Pendant un jeu : aucune interface visible.
     await expect(page.locator('.home')).not.toHaveClass(/visible/);
+    if (id === 'train') await page.waitForTimeout(2600); // le train arrive
     if (id !== 'bulles') {
       const m = await measureTargets(page);
       expect(m.count).toBeGreaterThan(0);
@@ -198,7 +200,7 @@ test('couleurs : glisser une balle près de son panier la fait entrer', async ({
 
 test('pause douce : un tap ne fait rien, un appui long montre les boutons adulte', async ({ page }) => {
   await open(page, '?minutes=0.05');
-  await launch(page, 'animaux');
+  await launch(page, 'table');
   const pause = page.locator('.pause');
   await expect(pause).toHaveClass(/visible/, { timeout: 8000 });
 
@@ -212,7 +214,7 @@ test('pause douce : un tap ne fait rien, un appui long montre les boutons adulte
   const r = await center(page.locator('.adult .resume'));
   await page.touchscreen.tap(r.x, r.y);
   await expect(pause).toHaveCount(0);
-  await expect(page.locator('.game[data-game=animaux]')).toBeAttached();
+  await expect(page.locator('.game[data-game=table]')).toBeAttached();
 });
 
 test('rotation : la mise en page suit en direct', async ({ page }) => {
@@ -231,10 +233,10 @@ test('hors-ligne : après une première visite, le jeu se recharge sans réseau'
   await open(page);
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.reload(); // le service worker contrôle maintenant la page
-  await expect(page.locator('.tile')).toHaveCount(4);
+  await expect(page.locator('.tile')).toHaveCount(GAMES.length);
   await context.setOffline(true);
   await page.reload();
-  await expect(page.locator('.tile')).toHaveCount(4);
+  await expect(page.locator('.tile')).toHaveCount(GAMES.length);
   await launch(page, 'bulles');
   await context.setOffline(false);
 });

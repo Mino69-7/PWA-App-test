@@ -4,16 +4,28 @@ Application web installable (PWA) pour un enfant de 1 à 3 ans : 100 % gratuite,
 
 > « Coucou » est un nom provisoire, facile à changer (voir plus bas).
 
-## Les 4 mini-jeux
+## Les 8 mini-jeux
 
-| Icône | Jeu | Comment on joue |
+| Jeu | Comment on joue | Ce qui évolue avec les niveaux |
 |---|---|---|
-| Bulles | **Bulles à toucher** | Des bulles pastel montent doucement. Un tap (même à côté) en fait éclater une, avec un petit « plop ». |
-| Rond, carré, triangle | **Formes dans leur trou** | Glisser chaque forme vers sa silhouette, ou simplement la toucher : elle y va toute seule. |
-| Panier | **Trier les couleurs** | Poser chaque balle dans le panier de sa couleur. Une voix dit la couleur. |
-| Chat | **Animaux** | Toucher un animal : il bouge et la voix dit « Le chat fait miaou ! ». |
+| **Le train des animaux** | Le train arrive avec 3 animaux qui portent un foulard de couleur : on glisse chacun dans la maison de la même couleur. Une manche sur deux, le train revient vide chercher les animaux devant leurs maisons. 16 animaux différents. | Aide au tap → plus d'aide → une 4ᵉ maison « piège » → wagons sans couleur (seul le foulard compte) |
+| **Bulles magiques** | Chaque bulle contient une surprise (étoile, cœur, fleur, poisson) qui tombe au sol quand la bulle éclate. 6 surprises = une manche. | Toutes les bulles → « les bulles bleues ! » → « les étoiles ! » → les deux en alternance, un peu plus vite |
+| **Formes dans leur trou** | Glisser chaque forme vers sa silhouette. | 3 formes avec aide → sans aide → 4 formes (étoile, cœur, losange) → toutes de la même couleur |
+| **Trier les couleurs** | Poser chaque balle dans le panier de sa couleur. | 2 paniers → plus de balles → 3 paniers → 5 balles |
+| **Coloriage** | Choisir un pot de couleur, puis toucher ou frotter une partie de l'animal : elle se colorie entièrement. Quand tout est colorié, l'animal fait la fête. | Dessins de 3 parties → 4 parties → 5 parties |
+| **Coucou caché** | Un animal se cache derrière un buisson : on touche le bon buisson pour le retrouver (« Coucou ! »). | 2 buissons, oreilles visibles → 3 buissons → plus d'oreilles → les buissons se déplacent après la cachette |
+| **À table !** | Donner à chaque animal ce qu'il mange (la carotte au lapin, l'os au chien…). | 2 animaux avec aide → sans aide → 3 animaux → un aliment en trop → 4 animaux |
+| **Petit orchestre** | Un xylophone : on joue librement, puis « Écoute bien… À toi ! » : retrouver la lame qui a chanté. | Jeu libre → 1 note → 2 notes → 3 notes → 4 notes |
 
-Aucun échec possible : un tap n'importe où donne toujours une réaction douce, et une forme lâchée au mauvais endroit revient doucement à sa place, sans bruit négatif.
+Aucun échec possible : un tap n'importe où donne toujours une réaction douce, et un objet lâché au mauvais endroit revient doucement à sa place, sans bruit négatif. La voix aide alors gentiment (« Rouge ! », « Qui mange la carotte ? »).
+
+### Les niveaux (sans sauvegarde)
+
+Chaque jeu commence au niveau 1 à l'ouverture de l'app. La difficulté **monte toutes les 3 manches réussies** (petite fanfare et « Tu es trop forte ! »). Si l'enfant peine deux manches de suite (3 erreurs ou plus, ou plus d'1 min 30), on **redescend discrètement d'un cran**. Les niveaux sont gardés tant que l'app reste ouverte, puis tout repart à zéro : rien n'est enregistré.
+
+La difficulté monte par la réflexion (plus de choix, moins d'indices), jamais par le geste : les objets restent aussi grands et aussi tolérants.
+
+- Pour essayer directement un niveau : ajoutez `?niveau=3` à la fin de l'adresse.
 
 ## Pour l'adulte
 
@@ -54,21 +66,32 @@ Dans les options de l'Accès guidé, vous pouvez aussi désactiver les **boutons
 
 ## Publier une mise à jour
 
-1. Modifiez les fichiers, puis renvoyez-les sur GitHub (même méthode « Add file → Upload files »).
+1. Modifiez les fichiers, puis renvoyez-les sur GitHub (`git push`).
 2. **Important** : dans `sw.js`, augmentez le numéro `VERSION` (par exemple `1` → `2`). Sans ça, les appareils garderont l'ancienne version en cache.
 3. Sur l'iPhone/iPad, l'app installée se met à jour au lancement suivant avec internet. Si ce n'est pas le cas : fermez complètement l'app (balayez-la depuis le sélecteur d'apps), rouvrez-la, refermez-la, puis rouvrez-la encore.
 4. En dernier recours : supprimez l'icône de l'écran d'accueil, puis **Réglages → Safari → Avancé → Données des sites web**, supprimez la ligne `github.io`, et réinstallez depuis Safari.
 
-## Enregistrer votre propre voix (facultatif)
+## Les voix
 
-Par défaut, c'est la voix française de l'appareil qui parle. Pour la remplacer :
+Toutes les phrases sont dites par une **voix neuronale libre et gratuite** (« Jessica », voix française du projet open source Piper, un peu ralentie et adoucie). Les fichiers audio sont fabriqués une seule fois sur l'ordinateur et livrés avec le jeu : ils fonctionnent hors-ligne, sans aucun service payant. Si un fichier manque, la voix de l'appareil prend le relais.
 
-1. Enregistrez un fichier par phrase avec l'app **Dictaphone** (format `.m4a`), par exemple `chat.m4a`.
-2. Créez un dossier `audio` à côté de `index.html` et mettez-y les fichiers.
-3. Dans `js/data/recordings.js`, retirez les `//` devant la ligne correspondante.
-4. Ajoutez le fichier à la liste `FILES` de `sw.js` et augmentez `VERSION`.
+**Changer ou ajouter une phrase** :
+1. Modifiez le texte dans `js/data/phrases.js`.
+2. Lancez le générateur (seules les phrases nouvelles ou modifiées sont refaites) :
 
-Si un fichier manque, la voix de l'appareil prend automatiquement le relais.
+```bash
+node outils/voix/generer.mjs
+```
+
+3. Augmentez `VERSION` dans `sw.js`, puis publiez.
+
+Le générateur a besoin de Python avec Piper (`pip install piper-tts`), de la voix `fr_FR-upmc-medium` (`python -m piper.download_voices fr_FR-upmc-medium`) et de ffmpeg, tous gratuits. Les chemins se règlent en haut de `outils/voix/generer.mjs`.
+
+**Votre propre voix (facultatif)** : enregistrez la phrase avec l'app **Dictaphone** (`.m4a`), placez le fichier dans un dossier `audio/`, ajoutez une ligne dans `js/data/recordings.js` (par exemple `'nom-chat': 'audio/chat.m4a'`, la clé étant celle de `phrases.js`), ajoutez le fichier à `FILES` dans `sw.js` et augmentez `VERSION`.
+
+## Site de test (V2 avant publication)
+
+La version en cours de développement est publiée sur un second dépôt, `PWA-App-test`, à l'adresse `https://mino69-7.github.io/PWA-App-test/`. On peut l'installer sur l'écran d'accueil à côté de la vraie : chaque site garde son propre cache hors-ligne. Quand tout est validé, on publie sur `PWA-App`.
 
 ## Tester sur ce PC
 
@@ -76,7 +99,7 @@ Double-cliquez (ou clic droit → *Exécuter avec PowerShell*) sur `outils/serve
 
 ## Tests automatiques (facultatif)
 
-Ils vérifient le jeu dans le moteur de Safari (WebKit), sur iPhone et iPad, en portrait et en paysage : zoom bloqué, coin maison, tailles des cibles, pause, rotation, hors-ligne, absence d'erreurs. Ils nécessitent Node.js :
+Ils vérifient le jeu dans le moteur de Safari (WebKit), sur iPhone et iPad, en portrait et en paysage : zoom bloqué, coin maison, tailles des cibles, pause, rotation, hors-ligne, chaque jeu et ses niveaux, présence des voix, absence d'erreurs. Ils nécessitent Node.js :
 
 ```bash
 npm install
@@ -109,9 +132,16 @@ js/core/layout.js        taille d'écran, rotation, encoche
 js/core/session.js       minuteur de 15 min et écran de pause
 js/core/homeGuard.js     coin caché et bouton maison
 js/core/effects.js       ondulation et petits utilitaires
+js/core/game.js          base commune des jeux (scène, fin de manche)
+js/core/levels.js        niveaux adaptatifs (en mémoire, sans sauvegarde)
+js/data/art.js           dessins : 16 animaux, maisons, train, aliments, buissons
+js/data/phrases.js       toutes les phrases de la voix
 js/data/recordings.js    vos enregistrements audio (facultatif)
 js/games/*.js            un fichier par mini-jeu
+audio/voix/              voix générées (une phrase = un .mp3)
+outils/voix/             générateur des voix (Piper + ffmpeg)
 outils/serveur-local.ps1 serveur de test local pour Windows
+tests/                   tests automatiques WebKit
 ```
 
 Chaque jeu exporte `{ id, icon, create() }` et l'objet créé expose `init(container, services)`, `start()`, `stop()` et `resize()`. Pour ajouter un jeu, créez un nouveau fichier dans `js/games/` sur ce modèle et ajoutez-le à la liste `GAMES` de `js/main.js` (et à `FILES` dans `sw.js`).
